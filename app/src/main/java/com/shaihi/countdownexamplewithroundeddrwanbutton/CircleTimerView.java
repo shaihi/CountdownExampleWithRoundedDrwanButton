@@ -13,7 +13,7 @@ public class CircleTimerView extends View {
     private Paint circlePaint;
     private Paint backgroundPaint;
     private int progress = 0;  // The progress in seconds
-    private int maxProgress = 30;  // Default to 30 seconds
+    private int maxProgress = 3;  // Default to 3 seconds
     private RectF circleBounds;  // Define the bounds for the arc
     private int strokeWidth = 30; // Width of the circle stroke
 

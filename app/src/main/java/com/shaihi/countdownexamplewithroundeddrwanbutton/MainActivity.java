@@ -12,7 +12,7 @@ public class MainActivity extends AppCompatActivity {
     private Button startButton;
     private EditText inputTime;
     private Handler handler = new Handler();
-    private int timeInSeconds = 30; // Default to 30 seconds
+    private int timeInSeconds = 3; // Default to 3 seconds
     private boolean isTimerRunning = false;
 
     @Override
@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
         startButton.setOnClickListener(v -> {
             if (!isTimerRunning) {
                 // Get user input time or use default
+                startButton.setEnabled(false);
                 String input = inputTime.getText().toString();
                 if (!input.isEmpty()) {
                     timeInSeconds = Integer.parseInt(input);
@@ -56,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             isTimerRunning = false;  // Timer has ended, allow restart
+            // Enable the button after the countdown finishes
+            runOnUiThread(() -> startButton.setEnabled(true));
         }).start();
     }
 
