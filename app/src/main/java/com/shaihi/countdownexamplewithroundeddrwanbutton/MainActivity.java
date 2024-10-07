@@ -1,83 +1,67 @@
 package com.shaihi.countdownexamplewithroundeddrwanbutton;
 
-import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.view.View;
-import android.widget.Toast;
-
+import android.os.Handler;
+import android.widget.Button;
+import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    private CircleTimerView timerButton;
-    private CountDownTimer countDownTimer;
-    private boolean isFlashing = false;
+    private CircleTimerView circleTimerView;
+    private Button startButton;
+    private EditText inputTime;
+    private Handler handler = new Handler();
+    private int timeInSeconds = 30; // Default to 30 seconds
     private boolean isTimerRunning = false;
-    private long timeLeftInMillis = 30000;  // 30 seconds
-    private static final int FLASH_DURATION_MS = 500;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        timerButton = findViewById(R.id.timerButton);
+        circleTimerView = findViewById(R.id.circleTimerView);
+        startButton = findViewById(R.id.startButton);
+        inputTime = findViewById(R.id.timeInput);
 
-        timerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isTimerRunning) {
-                    stopFlashing();
-                } else {
-                    startCountdown();
+        startButton.setOnClickListener(v -> {
+            if (!isTimerRunning) {
+                // Get user input time or use default
+                String input = inputTime.getText().toString();
+                if (!input.isEmpty()) {
+                    timeInSeconds = Integer.parseInt(input);
                 }
+
+                circleTimerView.setMaxProgress(timeInSeconds);  // Set timer based on input
+                startCountdown(timeInSeconds);  // Start the timer
+
+                isTimerRunning = true;
+                startButton.setText("Restart Timer");
+            } else {
+                // Reset timer if clicked again
+                resetTimer();
             }
         });
     }
 
-    private void startCountdown() {
-        countDownTimer = new CountDownTimer(timeLeftInMillis, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                timeLeftInMillis = millisUntilFinished;
-                int secondsLeft = (int) (timeLeftInMillis / 1000);
-                timerButton.updateProgress(secondsLeft);
-            }
-
-            @Override
-            public void onFinish() {
-                // When the timer finishes, make the button start flashing
-                startFlashing();
-            }
-        }.start();
-        isTimerRunning = true;
-    }
-
-    PorterDuff.Mode bgMode;
-    private void startFlashing() {
-        isFlashing = true;
-        timerButton.setBackgroundColor(3);
-
-        /*new Thread(() -> {
-            try {
-                while (isFlashing) {
-                    runOnUiThread(() -> timerButton.setVisibility(View.INVISIBLE));
-                    Thread.sleep(FLASH_DURATION_MS);
-                    runOnUiThread(() -> timerButton.setVisibility(View.VISIBLE));
-                    Thread.sleep(FLASH_DURATION_MS);
+    private void startCountdown(int totalSeconds) {
+        new Thread(() -> {
+            for (int i = totalSeconds; i >= 0; i--) {
+                final int secondsLeft = i;
+                runOnUiThread(() -> circleTimerView.updateProgress(secondsLeft));
+                try {
+                    Thread.sleep(1000);  // Sleep for 1 second
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
-        }).start();*/
+            isTimerRunning = false;  // Timer has ended, allow restart
+        }).start();
     }
 
-    private void stopFlashing() {
-        isFlashing = false;
-        timerButton.setBackgroundColor(getColor(R.drawable.round_button_background));
-        timerButton.resetProgress();
+    private void resetTimer() {
         isTimerRunning = false;
-        timeLeftInMillis = 30000;  // Reset the timer to 30 seconds
+        circleTimerView.resetProgress();
+        startButton.setText("Start Timer");
     }
 }
