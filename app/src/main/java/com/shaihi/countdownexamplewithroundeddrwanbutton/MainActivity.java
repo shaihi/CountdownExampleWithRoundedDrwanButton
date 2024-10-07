@@ -1,5 +1,6 @@
 package com.shaihi.countdownexamplewithroundeddrwanbutton;
 
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.View;
@@ -53,11 +54,12 @@ public class MainActivity extends AppCompatActivity {
         isTimerRunning = true;
     }
 
+    PorterDuff.Mode bgMode;
     private void startFlashing() {
         isFlashing = true;
-        timerButton.setBackgroundColor(getResources().getColor(android.R.color.holo_red_dark));
+        timerButton.setBackgroundColor(3);
 
-        new Thread(() -> {
+        /*new Thread(() -> {
             try {
                 while (isFlashing) {
                     runOnUiThread(() -> timerButton.setVisibility(View.INVISIBLE));
@@ -68,12 +70,12 @@ public class MainActivity extends AppCompatActivity {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }).start();
+        }).start();*/
     }
 
     private void stopFlashing() {
         isFlashing = false;
-        timerButton.setBackgroundColor(getResources().getColor(android.R.color.holo_green_dark));
+        timerButton.setBackgroundColor(getColor(R.drawable.round_button_background));
         timerButton.resetProgress();
         isTimerRunning = false;
         timeLeftInMillis = 30000;  // Reset the timer to 30 seconds
